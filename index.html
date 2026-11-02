@@ -3,87 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batutta-batutta </title>
-<link rel="manifest" href="manifest.json">
+<title>Batutta</title>
 <link rel="icon" href="icon-192.png">
-<meta name="theme-color" content="#ff7a00">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
 <style>body{font-family:'Tajawal',sans-serif} *{transition:.2s}</style>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyC88OTsrgAVLHcc1mrYeG0Gjsq0S8r9wkw",
-  authDomain: "batutta-social.firebaseapp.com",
-  projectId: "batutta-social",
-  storageBucket: "batutta-social.firebasestorage.app",
-  messagingSenderId: "954045535190",
-  appId: "1:954045535190:web:8b17fd7b0def29e4348a77"
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-window.auth = auth;
-window.db = db;
-window.storage = storage;
-window.firebaseAuthFns = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification, onAuthStateChanged, signInWithPopup, GoogleAuthProvider };
-window.firebaseDBFns = { collection, addDoc, getDocs, serverTimestamp, query, orderBy, doc, getDoc, setDoc };
-
-console.log("batutta connected");
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#fff7ed] min-h-screen">
 
-<!-- LANGUAGE SWITCHER -->
 <button id="langBtn" class="fixed top-3 left-3 z-50 bg-white border rounded-full w-10 h-10 shadow">🌐</button>
 
-<!-- AUTH -->
 <div id="authScreen" class="min-h-screen flex items-center justify-center p-4">
   <div class="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-8 border border-orange-100">
     <div class="text-center mb-6">
       <img src="icon-192.png" class="w-20 h-20 mx-auto mb-3 rounded-2xl shadow"/>
-      <h1 class="text-4xl font-extrabold text-[#ff7a00]" data-i18n="appName">Batutta</h1>
-      <p class="text-gray-500 mt-1" data-i18n="tagline">شبكتك الاجتماعية العالمية</p>
+      <h1 class="text-4xl font-extrabold text-[#ff7a00]">Batutta</h1>
+      <p class="text-gray-500 mt-1">شبكتك الاجتماعية العالمية</p>
     </div>
-
     <div class="space-y-3">
-      <input id="displayName" type="text" placeholder="اسمك" class="w-full p-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-orange-400 outline-none" data-i18n-ph="namePh">
+      <input id="displayName" type="text" placeholder="اسمك" class="w-full p-4 rounded-2xl border border-gray-200 outline-none">
       <input id="email" type="email" placeholder="الإيميل" class="w-full p-4 rounded-2xl border border-gray-200 outline-none">
-      <input id="password" type="password" placeholder="كلمة السر" class="w-full p-4 rounded-2xl border border-gray-200 outline-none" data-i18n-ph="passPh">
-      
+      <input id="password" type="password" placeholder="كلمة السر" class="w-full p-4 rounded-2xl border border-gray-200 outline-none">
       <div class="pt-2">
-        <p class="text-sm font-bold mb-2" data-i18n="genderQ">النوع:</p>
+        <p class="text-sm font-bold mb-2">النوع:</p>
         <div class="grid grid-cols-2 gap-3">
-          <button id="genderMale" class="genderBtn border-2 border-gray-200 p-3 rounded-2xl font-bold" data-gender="male">👨 <span data-i18n="male">ذكر</span></button>
-          <button id="genderFemale" class="genderBtn border-2 border-gray-200 p-3 rounded-2xl font-bold" data-gender="female">👩 <span data-i18n="female">أنثى</span></button>
+          <button id="genderMale" class="genderBtn border-2 border-gray-200 p-3 rounded-2xl font-bold" data-gender="male">👨 ذكر</button>
+          <button id="genderFemale" class="genderBtn border-2 border-gray-200 p-3 rounded-2xl font-bold" data-gender="female">👩 أنثى</button>
         </div>
       </div>
-
-      <button id="signupBtn" class="w-full bg-[#ff7a00] text-white p-4 rounded-2xl font-bold mt-2" data-i18n="signup">حساب جديد</button>
-      <button id="loginBtn" class="w-full bg-white border-2 border-gray-200 p-4 rounded-2xl font-bold" data-i18n="login">دخول</button>
-      <div class="text-center text-gray-400 text-sm" data-i18n="or">أو</div>
-      <button id="googleBtn" class="w-full bg-white border p-4 rounded-2xl font-bold">🔵 Google</button>
+      <button id="signupBtn" class="w-full bg-[#ff7a00] text-white p-4 rounded-2xl font-bold mt-2">حساب جديد</button>
+      <button id="loginBtn" class="w-full bg-white border-2 border-gray-200 p-4 rounded-2xl font-bold">دخول</button>
       <p id="authError" class="text-red-500 text-sm text-center"></p>
     </div>
   </div>
 </div>
 
-<!-- VERIFY -->
-<div id="verifyScreen" class="hidden min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white rounded-[32px] p-8 max-w-md w-full text-center shadow">
-    <h2 class="text-2xl font-bold mb-3" data-i18n="verifyTitle">تأكيد الإيميل 📧</h2>
-    <p class="text-gray-600 mb-4" data-i18n="verifyText">رسلنا ليك رابط تأكيد في إيميلك.</p>
-    <button id="resendBtn" class="bg-orange-100 text-[#ff7a00] px-6 py-3 rounded-xl font-bold" data-i18n="resend">إعادة إرسال</button>
-    <button id="backToLogin" class="block mx-auto mt-4 text-gray-500" data-i18n="back">رجوع</button>
-  </div>
-</div>
-
-<!-- APP -->
 <div id="appScreen" class="hidden">
   <header class="bg-white sticky top-0 z-10 border-b border-orange-100">
     <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -93,7 +48,7 @@ console.log("batutta connected");
       <div class="flex items-center gap-3">
         <span id="userGenderBadge" class="text-xs bg-orange-100 text-[#ff7a00] px-2 py-1 rounded-full"></span>
         <img id="userAvatar" class="w-9 h-9 rounded-full bg-orange-100 object-cover"/>
-        <button id="logoutBtn" class="text-sm text-gray-500" data-i18n="logout">خروج</button>
+        <button id="logoutBtn" class="text-sm text-gray-500">خروج</button>
       </div>
     </div>
   </header>
@@ -101,56 +56,27 @@ console.log("batutta connected");
     <div class="bg-white rounded-[24px] p-5 shadow-sm border border-orange-50 mb-6">
       <div class="flex gap-3">
         <img id="createAvatar" class="w-10 h-10 rounded-full bg-orange-100 object-cover"/>
-        <textarea id="postText" class="flex-1 bg-[#fff7ed] rounded-2xl p-4 min-h-[80px] outline-none" data-i18n-ph="whatMind"></textarea>
+        <textarea id="postText" class="flex-1 bg-[#fff7ed] rounded-2xl p-4 min-h-[80px] outline-none" placeholder="شنو في بالك؟"></textarea>
       </div>
       <div id="postImagePreview" class="hidden mt-3 relative">
         <img id="previewImg" class="w-full rounded-2xl max-h-80 object-cover"/>
         <button id="removeImg" class="absolute top-2 left-2 bg-black/60 text-white rounded-full w-8 h-8">×</button>
       </div>
       <div class="flex justify-between items-center mt-4">
-        <label class="cursor-pointer text-[#ff7a00] font-bold">📷 <span data-i18n="image">صورة</span>
+        <label class="cursor-pointer text-[#ff7a00] font-bold">📷 صورة
           <input type="file" id="imageInput" accept="image/*" class="hidden">
         </label>
-        <button id="publishBtn" class="bg-[#ff7a00] text-white px-8 py-3 rounded-2xl font-bold" data-i18n="postBtn">نشر</button>
+        <button id="publishBtn" class="bg-[#ff7a00] text-white px-8 py-3 rounded-2xl font-bold">نشر</button>
       </div>
     </div>
     <div id="feed" class="space-y-4"></div>
   </main>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendEmailVerification, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-// 🔴🔴🔴 ضعي كونفج Firebase الحقيقي هنا 🔴🔴🔴
-const firebaseConfig = {
-  apiKey: "PUT_YOUR_API_KEY_HERE",
-  authDomain: "batutta-social.firebaseapp.com",
-  projectId: "batutta-social",
-  storageBucket: "batutta-social.firebasestorage.app",
-  messagingSenderId: "PUT_YOUR_SENDER_ID",
-  appId: "PUT_YOUR_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// i18n
-const I18N = {
-  ar: {appName:"batutta", tagline:"شبكتك الاجتماعية العالمية", namePh:"اسمك", passPh:"كلمة السر", genderQ:"النوع:", male:"ذكر", female:"أنثى", signup:"حساب جديد", login:"دخول", or:"أو", verifyTitle:"تأكيد الإيميل 📧", verifyText:"رسلنا ليك رابط تأكيد في إيميلك.", resend:"إعادة إرسال", back:"رجوع", logout:"خروج", whatMind:"شنو في بالك؟", image:"صورة", postBtn:"نشر"},
-  en: {appName:"Batutta", tagline:"Your Global Social Network", namePh:"Your name", passPh:"Password", genderQ:"Gender:", male:"Male", female:"Female", signup:"Sign Up", login:"Login", or:"or", verifyTitle:"Verify Email 📧", verifyText:"We sent a verification link to your email.", resend:"Resend", back:"Back", logout:"Logout", whatMind:"What's on your mind?", image:"Image", postBtn:"Post"}
-};
-let lang = localStorage.getItem('batutta_lang') || (navigator.language.startsWith('ar')?'ar':'en');
-function applyLang(){
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang==='ar'?'rtl':'ltr';
-  document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(I18N[lang][k]) el.textContent=I18N[lang][k]; });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const k=el.getAttribute('data-i18n-ph'); if(I18N[lang][k]) el.placeholder=I18N[lang][k]; });
-}
-applyLang();
-document.getElementById('langBtn').onclick=()=>{ lang = lang==='ar'?'en':'ar'; localStorage.setItem('batutta_lang', lang); applyLang(); };
+<script>
+const SUPABASE_URL = "https://jhdhysqixxjjwrgpdqfd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_OlTsulPNb1L4P_Oka1wtkQ_6dJVqEPi";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let selectedGender = null;
 let selectedImageBase64 = null;
@@ -164,46 +90,44 @@ document.querySelectorAll('.genderBtn').forEach(btn=>{
   };
 });
 
-function show(id){ ['authScreen','verifyScreen','appScreen'].forEach(s=>document.getElementById(s).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+function show(id){ ['authScreen','appScreen'].forEach(s=>document.getElementById(s).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
 
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){ show('authScreen'); return; }
-  if(!user.emailVerified && user.providerData[0]?.providerId !== 'google.com'){ show('verifyScreen'); return; }
-  const ref = doc(db,"users",user.uid);
-  let snap = await getDoc(ref);
-  if(!snap.exists()){
-    await setDoc(ref,{uid:user.uid,email:user.email,displayName:user.displayName||document.getElementById('displayName').value||user.email.split('@')[0], gender: selectedGender||'male', photoURL:user.photoURL||"", createdAt:serverTimestamp()});
-    snap = await getDoc(ref);
+async function checkUser(){
+  const { data: { session } } = await supabase.auth.getSession();
+  if(!session){ show('authScreen'); return; }
+  const { data } = await supabase.from('users').select('*').eq('uid', session.user.id).single();
+  if(!data){ 
+    // لو المستخدم موجود في Auth بس ما في جدول users
+    show('authScreen'); 
+    return; 
   }
-  currentProfile = snap.data();
-  document.getElementById('userAvatar').src = currentProfile.photoURL || `https://ui-avatars.com/api/?name=${currentProfile.displayName}&background=ff7a00&color=fff`;
+  currentProfile = data;
+  document.getElementById('userAvatar').src = data.photoURL || data.avatar_url || `https://ui-avatars.com/api/?name=${data.displayName}&background=ff7a00&color=fff`;
   document.getElementById('createAvatar').src = document.getElementById('userAvatar').src;
-  document.getElementById('userGenderBadge').textContent = currentProfile.gender==='female' ? (lang==='ar'?'👩 أنثى':'👩 Female') : (lang==='ar'?'👨 ذكر':'👨 Male');
+  document.getElementById('userGenderBadge').textContent = data.gender==='female' ? '👩 أنثى' : '👨 ذكر';
   show('appScreen'); loadFeed();
-});
+}
+checkUser();
+supabase.auth.onAuthStateChange(()=> checkUser());
 
 document.getElementById('signupBtn').onclick = async ()=>{
   const email=document.getElementById('email').value.trim(), pass=document.getElementById('password').value, name=document.getElementById('displayName').value.trim();
-  if(!name) return alert(lang==='ar'?'اكتب اسمك':'Enter name');
-  if(!selectedGender) return alert(lang==='ar'?'اختار النوع ذكر أو أنثى':'Select gender');
-  try{
-    const cred = await createUserWithEmailAndPassword(auth,email,pass);
-    await setDoc(doc(db,"users",cred.user.uid),{uid:cred.user.uid,email,displayName:name,gender:selectedGender,photoURL:"",createdAt:serverTimestamp()});
-    await sendEmailVerification(cred.user); show('verifyScreen');
-  }catch(e){ document.getElementById('authError').textContent=e.message; }
+  if(!name) return alert('اكتب اسمك');
+  if(!selectedGender) return alert('اختار النوع');
+  const { data, error } = await supabase.auth.signUp({ email, password: pass });
+  if(error){ document.getElementById('authError').textContent=error.message; return; }
+  if(data.user){
+    await supabase.from('users').insert({ uid: data.user.id, email, displayName: name, name: name, gender: selectedGender, photoURL: "" });
+  }
+  alert('تم! اعملي تسجيل دخول هسه');
 };
+
 document.getElementById('loginBtn').onclick = async ()=>{
-  try{ await signInWithEmailAndPassword(auth, document.getElementById('email').value.trim(), document.getElementById('password').value); }
-  catch(e){ document.getElementById('authError').textContent=e.message; }
+  const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('email').value.trim(), password: document.getElementById('password').value });
+  if(error) document.getElementById('authError').textContent=error.message;
 };
-document.getElementById('googleBtn').onclick = async ()=>{
-  try{
-    const prov=new GoogleAuthProvider(); await signInWithPopup(auth,prov);
-  }catch(e){ document.getElementById('authError').textContent=e.message; }
-};
-document.getElementById('resendBtn').onclick = async ()=>{ if(auth.currentUser) await sendEmailVerification(auth.currentUser); alert('Sent!'); };
-document.getElementById('backToLogin').onclick = ()=> signOut(auth);
-document.getElementById('logoutBtn').onclick = ()=> signOut(auth);
+
+document.getElementById('logoutBtn').onclick = async ()=>{ await supabase.auth.signOut(); show('authScreen'); };
 
 document.getElementById('imageInput').onchange = (e)=>{
   const file=e.target.files[0]; if(!file) return;
@@ -214,27 +138,29 @@ document.getElementById('removeImg').onclick = ()=>{ selectedImageBase64=null; d
 document.getElementById('publishBtn').onclick = async ()=>{
   const text=document.getElementById('postText').value.trim(); if(!text && !selectedImageBase64) return;
   const btn=document.getElementById('publishBtn'); btn.disabled=true;
-  try{
-    await addDoc(collection(db,"posts"),{text, image:selectedImageBase64||null, authorId:auth.currentUser.uid, authorName:currentProfile.displayName, authorPhoto:currentProfile.photoURL||"", authorGender:currentProfile.gender, likes:[], createdAt:serverTimestamp()});
-    document.getElementById('postText').value=""; document.getElementById('removeImg').click();
-  }catch(e){ alert(e.message); }
-  btn.disabled=false;
+  const { data: { session } } = await supabase.auth.getSession();
+  await supabase.from('posts').insert({ text, content: text, image: selectedImageBase64||null, image_url: selectedImageBase64||null, authorId: session.user.id, author_id: session.user.id, authorName: currentProfile.displayName, author_name: currentProfile.displayName, authorPhoto: currentProfile.photoURL||"", authorGender: currentProfile.gender, likes: [] });
+  document.getElementById('postText').value=""; document.getElementById('removeImg').click(); loadFeed(); btn.disabled=false;
 };
 
-function loadFeed(){
-  const q=query(collection(db,"posts"), orderBy("createdAt","desc"));
-  onSnapshot(q, (snap)=>{
-    const feed=document.getElementById('feed'); feed.innerHTML="";
-    snap.forEach(d=>{
-      const p=d.data(), id=d.id, liked=p.likes?.includes(auth.currentUser.uid);
-      const genderIcon = p.authorGender==='female'?'👩':'👨';
-      const el=document.createElement('div'); el.className="bg-white rounded-[24px] p-5 shadow-sm border border-orange-50";
-      el.innerHTML=`<div class="flex gap-3 items-center mb-3"><img src="${p.authorPhoto||`https://ui-avatars.com/api/?name=${p.authorName}&background=ff7a00&color=fff`}" class="w-10 h-10 rounded-full"/><div><div class="font-bold flex gap-2">${p.authorName} <span class="text-xs bg-orange-50 px-2 rounded-full">${genderIcon}</span></div><div class="text-xs text-gray-400">${p.createdAt?.toDate?p.createdAt.toDate().toLocaleString():'الآن'}</div></div></div>${p.text?`<p class="mb-3">${p.text}</p>`:''}${p.image?`<img src="${p.image}" class="w-full rounded-2xl mb-3 max-h-[500px] object-cover"/>`:''}<div class="flex gap-6 pt-2 border-t"><button class="likeBtn font-bold ${liked?'text-[#ff7a00]':'text-gray-500'}">${liked?'❤️':'🤍'} ${p.likes?.length||0}</button><button class="text-gray-500">💬</button></div>`;
-      el.querySelector('.likeBtn').onclick=async()=>{ const ref=doc(db,"posts",id); if(liked) await updateDoc(ref,{likes:arrayRemove(auth.currentUser.uid)}); else await updateDoc(ref,{likes:arrayUnion(auth.currentUser.uid)}); };
-      feed.appendChild(el);
-    });
+async function loadFeed(){
+  const { data } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+  const feed=document.getElementById('feed'); feed.innerHTML="";
+  const { data: { session } } = await supabase.auth.getSession();
+  (data||[]).forEach(p=>{
+    const liked = p.likes?.includes(session?.user.id);
+    const genderIcon = p.authorGender==='female'?'👩':'👨';
+    const el=document.createElement('div'); el.className="bg-white rounded-[24px] p-5 shadow-sm border border-orange-50";
+    el.innerHTML=`<div class="flex gap-3 items-center mb-3"><img src="${p.authorPhoto||p.author_photo||`https://ui-avatars.com/api/?name=${p.authorName||p.author_name}&background=ff7a00&color=fff`}" class="w-10 h-10 rounded-full"/><div><div class="font-bold flex gap-2">${p.authorName||p.author_name} <span class="text-xs bg-orange-50 px-2 rounded-full">${genderIcon}</span></div><div class="text-xs text-gray-400">${new Date(p.created_at).toLocaleString()}</div></div></div>${p.text||p.content?`<p class="mb-3">${p.text||p.content}</p>`:''}${p.image||p.image_url?`<img src="${p.image||p.image_url}" class="w-full rounded-2xl mb-3 max-h-[500px] object-cover"/>`:''}<div class="flex gap-6 pt-2 border-t"><button class="likeBtn font-bold ${liked?'text-[#ff7a00]':'text-gray-500'}">${liked?'❤️':'🤍'} ${p.likes?.length||0}</button></div>`;
+    el.querySelector('.likeBtn').onclick=async()=>{
+      let newLikes = liked ? p.likes.filter(id=>id!==session.user.id) : [...(p.likes||[]), session.user.id];
+      await supabase.from('posts').update({ likes: newLikes }).eq('id', p.id); loadFeed();
+    };
+    feed.appendChild(el);
   });
 }
+
+document.getElementById('langBtn').onclick=()=>{ alert('اللغة ح نرجعها بعد ما يشتغل'); }
 </script>
 </body>
 </html>
