@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batutta - بتوتا</title>
+<title>Batutta-batutta </title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <meta name="theme-color" content="#ff7a00">
@@ -113,7 +113,7 @@ const db = getFirestore(app);
 
 // i18n
 const I18N = {
-  ar: {appName:"بتوتا", tagline:"شبكتك الاجتماعية العالمية", namePh:"اسمك", passPh:"كلمة السر", genderQ:"النوع:", male:"ذكر", female:"أنثى", signup:"حساب جديد", login:"دخول", or:"أو", verifyTitle:"تأكيد الإيميل 📧", verifyText:"رسلنا ليك رابط تأكيد في إيميلك.", resend:"إعادة إرسال", back:"رجوع", logout:"خروج", whatMind:"شنو في بالك؟", image:"صورة", postBtn:"نشر"},
+  ar: {appName:"batutta", tagline:"شبكتك الاجتماعية العالمية", namePh:"اسمك", passPh:"كلمة السر", genderQ:"النوع:", male:"ذكر", female:"أنثى", signup:"حساب جديد", login:"دخول", or:"أو", verifyTitle:"تأكيد الإيميل 📧", verifyText:"رسلنا ليك رابط تأكيد في إيميلك.", resend:"إعادة إرسال", back:"رجوع", logout:"خروج", whatMind:"شنو في بالك؟", image:"صورة", postBtn:"نشر"},
   en: {appName:"Batutta", tagline:"Your Global Social Network", namePh:"Your name", passPh:"Password", genderQ:"Gender:", male:"Male", female:"Female", signup:"Sign Up", login:"Login", or:"or", verifyTitle:"Verify Email 📧", verifyText:"We sent a verification link to your email.", resend:"Resend", back:"Back", logout:"Logout", whatMind:"What's on your mind?", image:"Image", postBtn:"Post"}
 };
 let lang = localStorage.getItem('batutta_lang') || (navigator.language.startsWith('ar')?'ar':'en');
