@@ -1,3 +1,4 @@
+
 {
   "name": "Batutta Social - بطوطة سوشيال",
   "short_name": "Batutta",
@@ -5,5 +6,11 @@
   "display": "standalone",
   "background_color": "#FFF8F0",
   "theme_color": "#FF6B6B",
-  "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/1864/1864514.png","sizes": "512x512","type": "image/png"}]
+  "icons": [
+    {
+      "src": "IMG-20261102-WA4502.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
 }
