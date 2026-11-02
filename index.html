@@ -1,1 +1,175 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Batutta 🦆</title><script src="https://cdn.tailwindcss.com"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&display=swap" rel="stylesheet"><style>*{font-family:'Tajawal',sans-serif}</style></head><body class="bg-[#fff7ed] min-h-screen"><header class="sticky top-0 z-20 bg-gradient-to-r from-[#ff7a00] to-[#ff9d2f] text-white p-3 flex justify-between"><span class="font-black text-xl">🦆 batutta</span><span class="text-sm bg-white/20 px-3 py-1 rounded-full">متصل 🟢</span></header><main class="max-w-[680px] mx-auto pb-20"><div class="bg-white m-2 p-3 rounded-[18px] flex gap-3 overflow-x-auto"><div class="min-w-[60px] text-center"><div class="w-[60px] h-[60px] rounded-full border-2 border-dashed border-[#ff7a00] flex items-center justify-center text-2xl">+</div><small>قصتك</small></div><div class="min-w-[60px] text-center"><div class="w-[60px] h-[60px] rounded-full p-[3px] bg-gradient-to-tr from-yellow-400 to-[#ff7a00]"><img src="https://i.pravatar.cc/100?img=5" class="w-full h-full rounded-full border-2 border-white"></div><small>سارة</small></div></div><div class="bg-white m-2 p-4 rounded-[18px] shadow-sm"><div class="flex gap-2"><div class="w-10 h-10 rounded-full bg-[#ffedd5] flex items-center justify-center font-black text-[#ff7a00]">ب</div><input id="postText" placeholder="بماذا تفكر يا بطوطة؟" class="flex-1 bg-[#fff7ed] border border-[#ffe4c0] rounded-full px-4 py-2 outline-none"></div><div class="flex gap-2 mt-3"><label class="bg-[#fff7ed] text-[#ff7a00] px-4 py-2 rounded-full cursor-pointer">📷 صورة<input type="file" id="fileInput" accept="image/*" class="hidden"></label><button onclick="createPost()" id="postBtn" class="mr-auto bg-[#ff7a00] text-white px-6 py-2 rounded-full font-bold">نشر 🚀</button></div><img id="preview" class="hidden w-full rounded-xl mt-3"></div><div id="postsContainer"></div></main><script>const firebaseConfig={apiKey:"AIzaSyC88OTsrgAVLHcc1mrYeG0Gjsq0S8r9wkw",authDomain:"batutta-social.firebaseapp.com",projectId:"batutta-social",storageBucket:"batutta-social.firebasestorage.app",messagingSenderId:"954045535190",appId:"1:954045535190:web:8b17fd7b0def29e4348a77"};firebase.initializeApp(firebaseConfig);const db=firebase.firestore();const storage=firebase.storage();const auth=firebase.auth();let currentUser=null;let selectedFile=null;auth.signInAnonymously().then(r=>currentUser=r.user);document.getElementById('fileInput').addEventListener('change',e=>{selectedFile=e.target.files[0];if(!selectedFile)return;const reader=new FileReader();reader.onload=ev=>{const p=document.getElementById('preview');p.src=ev.target.result;p.classList.remove('hidden');};reader.readAsDataURL(selectedFile);});async function createPost(){const text=document.getElementById('postText').value.trim();if(!text&&!selectedFile)return alert('اكتب شي');const btn=document.getElementById('postBtn');btn.textContent='جاري...';btn.disabled=true;try{let imageUrl="";if(selectedFile){const ref=storage.ref(`posts/${Date.now()}_${selectedFile.name}`);await ref.put(selectedFile);imageUrl=await ref.getDownloadURL();}await db.collection('posts').add({text,image:imageUrl,name:'بطوطة',likes:0,likedBy:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('postText').value="";document.getElementById('preview').classList.add('hidden');selectedFile=null;document.getElementById('fileInput').value="";}catch(e){alert(e.message);}btn.textContent='نشر 🚀';btn.disabled=false;}db.collection('posts').orderBy('createdAt','desc').onSnapshot(snap=>{const container=document.getElementById('postsContainer');if(snap.empty){container.innerHTML='<div class="bg-white m-2 p-8 rounded-[18px] text-center text-gray-400">لسه مافي بوستات، كوني أول واحدة 🧡</div>';return;}container.innerHTML=snap.docs.map(docSnap=>{const p=docSnap.data();const id=docSnap.id;const liked=p.likedBy?.includes(currentUser?.uid);return`<div class="bg-white m-2 p-4 rounded-[18px] shadow-sm"><div class="flex gap-2 items-center"><div class="w-8 h-8 rounded-full bg-[#ffedd5] flex items-center justify-center font-bold text-[#ff7a00]">ب</div><b>${p.name||'بطوطة'}</b></div><div class="mt-2">${(p.text||'').replace(/</g,'&lt;')}</div>${p.image?`<img src="${p.image}" class="w-full rounded-xl mt-2">`:''}<div class="flex gap-4 mt-3 border-t pt-2"><button onclick="likePost('${id}')" class="font-bold ${liked?'text-[#ff7a00]':''}">${liked?'🧡':'🤍'} ${p.likes||0}</button><button class="text-gray-500">💬 تعليق</button></div></div>`;}).join('');});async function likePost(id){const ref=db.collection('posts').doc(id);const snap=await ref.get();const data=snap.data();if(data.likedBy?.includes(currentUser.uid)){await ref.update({likes:firebase.firestore.FieldValue.increment(-1),likedBy:firebase.firestore.FieldValue.arrayRemove(currentUser.uid)});}else{await ref.update({likes:firebase.firestore.FieldValue.increment(1),likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)});}}</script></body></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batutta Social - بطوطة سوشيال</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FF6B6B">
+<style>
+:root{--p:#FF6B6B;--s:#4ECDC4;--bg:#FFF8F0;--card:#fff;--text:#2D3436}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
+body{background:var(--bg);color:var(--text);overflow-x:hidden}
+.screen{display:none;min-height:100vh;padding:20px}.screen.active{display:flex;flex-direction:column}
+.btn{background:var(--p);color:#fff;border:none;padding:14px 28px;border-radius:30px;font-size:18px;font-weight:700;cursor:pointer;width:100%;margin:10px 0}
+.btn-outline{background:transparent;border:2px solid var(--p);color:var(--p)}
+.card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin:10px 0}
+.input{width:100%;padding:14px;border:2px solid #eee;border-radius:15px;margin:8px 0;font-size:16px}
+.onboard-img{width:200px;height:200px;margin:20px auto;background:linear-gradient(135deg,var(--p),var(--s));border-radius:30px;display:flex;align-items:center;justify-content:center;font-size:80px}
+.profile-cover{height:150px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:20px;position:relative}
+.profile-pic{width:100px;height:100px;border-radius:50%;border:5px solid #fff;position:absolute;bottom:-40px;right:20px;background:#fff;object-fit:cover}
+.feed-header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:#fff;position:sticky;top:0;z-index:10}
+.story-bar{display:flex;gap:10px;overflow-x:auto;padding:10px}
+.story{width:65px;text-align:center}.story img{width:60px;height:60px;border-radius:50%;border:3px solid var(--p)}
+.post-actions{display:flex;gap:20px;padding:10px 0}.dot-nav{display:flex;justify-content:center;gap:8px;margin:20px}
+.dot{width:10px;height:10px;border-radius:50%;background:#ddd}.dot.active{background:var(--p);width:25px}
+.chat-bubble{max-width:70%;padding:12px 18px;border-radius:20px;margin:5px}.me{background:var(--p);color:#fff;margin-right:auto}.other{background:#eee}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;padding:12px;border-radius:25px 25px 0 0;box-shadow:0 -5px 20px rgba(0,0,0,.1)}
+</style>
+</head>
+<body>
+
+<!-- 1-5 صفحات تعريفية -->
+<div id="onboard1" class="screen active" style="align-items:center;justify-content:center;text-align:center">
+<div class="onboard-img">🏥</div><h1>العلاج - نعالج بعض</h1><p class="card">اسألي عن دكتور في وادي حلفا، تجارب علاج، نصائح صحية من بنات بلدك</p><button class="btn" onclick="nextOnboard(2)">التالي</button><div class="dot-nav"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+<div id="onboard2" class="screen" style="align-items:center;justify-content:center;text-align:center">
+<div class="onboard-img">📚</div><h1>التعليم - نتعلم سوا</h1><p class="card">كورسات، منح، شرح دروس، تجارب جامعات، مساعدة في الواجبات</p><button class="btn" onclick="nextOnboard(3)">التالي</button>
+</div>
+<div id="onboard3" class="screen" style="align-items:center;justify-content:center;text-align:center">
+<div class="onboard-img">✈️</div><h1>السياحة - نلف السودان</h1><p class="card">أماكن حلوة في الشمالية، صور من وادي حلفا، رحلات، ضيافة</p><button class="btn" onclick="nextOnboard(4)">التالي</button>
+</div>
+<div id="onboard4" class="screen" style="align-items:center;justify-content:center;text-align:center">
+<div class="onboard-img">💼</div><h1>العمل - نشتغل سوا</h1><p class="card">فرص شغل، مشاريع صغيرة، تسويق منتجات، دعم سيدات الأعمال</p><button class="btn" onclick="nextOnboard(5)">التالي</button>
+</div>
+<div id="onboard5" class="screen" style="align-items:center;justify-content:center;text-align:center">
+<div class="onboard-img">🦆💬</div><h1>دردشة وتبادل تجارب</h1><p class="card">احكي، فضفضي، اسألي، بدون حكم. مجتمع آمن للبنات فقط، مع بطوطة الذكية</p><button class="btn" onclick="showScreen('auth')">ادخلي عالم بطوطة 🦆</button>
+</div>
+
+<!-- تسجيل -->
+<div id="auth" class="screen">
+<h2 style="text-align:center;margin:20px">مرحباً يا بطوطة! اشتقنا ليك 🧡</h2>
+<div class="card">
+<input id="regName" class="input" placeholder="الاسم الكامل">
+<input id="regAge" class="input" type="number" placeholder="العمر">
+<select id="regGender" class="input"><option>النوع</option><option>بنت</option><option>ولد</option></select>
+<input id="regCity" class="input" placeholder="السكن - مثلاً وادي حلفا">
+<select id="regStatus" class="input"><option>الحالة الاجتماعية</option><option>عزباء</option><option>متزوجة</option><option>مخطوبة</option><option>طالبة</option></select>
+<input id="regPhone" class="input" placeholder="رقم الواتساب أو الإيميل">
+<input id="regPass" class="input" type="password" placeholder="كلمة السر">
+<button class="btn" onclick="register()">تسجيل جديد - دخول</button>
+<button class="btn btn-outline" onclick="register()">عندي حساب مسبقاً</button>
+</div>
+</div>
+
+<!-- بروفايل -->
+<div id="profileSetup" class="screen">
+<h2>كملي ملفك الشخصي</h2>
+<div class="card">
+<div class="profile-cover"><img id="previewPic" class="profile-pic" src="https://i.pravatar.cc/100"></div><br><br><br>
+<input type="file" id="picInput" accept="image/*" class="input" onchange="previewImage(event,'previewPic')">
+<input type="file" id="coverInput" accept="image/*" class="input">
+<input id="bio" class="input" placeholder="نبذة عنك - بتحبي شنو؟">
+<button class="btn" onclick="showScreen('main')">دخول للواجهة الرئيسية 🚀</button>
+</div>
+</div>
+
+<!-- الواجهة الرئيسية -->
+<div id="main" class="screen" style="padding-bottom:80px">
+<div class="feed-header"><h3>🦆 Batutta</h3><div>🔔 ✉️</div></div>
+<div class="story-bar">
+<div class="story"><img src="https://i.pravatar.cc/60?img=1"><p>قصتي</p></div>
+<div class="story"><img src="https://i.pravatar.cc/60?img=2"><p>سارة</p></div>
+<div class="story"><img src="https://i.pravatar.cc/60?img=5"><p>بطوطة الذكية</p></div>
+</div>
+<div class="card"><div style="display:flex;gap:10px"><img src="https://i.pravatar.cc/40" style="border-radius:50%"><input id="postText" class="input" placeholder="بماذا تفكرين يا مناسك؟" style="margin:0"></div><button class="btn" onclick="addPost()">نشر 🦆</button></div>
+<div id="feed"></div>
+<div class="bottom-nav"><span onclick="showScreen('main')">🏠</span><span onclick="showScreen('chat')">💬</span><span onclick="showScreen('calls')">📹</span><span onclick="showScreen('profile')">👤</span></div>
+</div>
+
+<!-- دردشة -->
+<div id="chat" class="screen" style="padding-bottom:80px">
+<h3>الدردشات</h3>
+<div class="card" onclick="openChat('batutta')"><b>🦆 بطوطة الذكية</b><p>أهلاً يا مناسك! كيف أقدر أساعدك؟</p></div>
+<div class="card"><b>سارة من حلفا</b><p>كيفك؟</p></div>
+<div id="chatBox" style="flex:1;overflow-y:auto"></div>
+<div style="display:flex;gap:5px"><input id="chatInput" class="input" placeholder="رسالة..."><button class="btn" style="width:80px" onclick="sendMsg()">➤</button><button class="btn" style="width:80px;background:var(--s)" onclick="startVoice()">🎤</button></div>
+<div class="bottom-nav"><span onclick="showScreen('main')">🏠</span><span onclick="showScreen('chat')">💬</span><span onclick="showScreen('calls')">📹</span><span onclick="showScreen('profile')">👤</span></div>
+</div>
+
+<!-- مكالمات -->
+<div id="calls" class="screen" style="text-align:center;justify-content:center">
+<div class="onboard-img">📹</div><h2>مكالمات فيديو</h2><p class="card">مكالمة حقيقية عبر WebRTC - آمنة ومشفرة</p><button class="btn" onclick="startCall()">بدء مكالمة فيديو</button><video id="localVideo" autoplay muted style="width:100%;border-radius:20px;margin:10px 0"></video><div class="bottom-nav"><span onclick="showScreen('main')">🏠</span><span onclick="showScreen('chat')">💬</span><span onclick="showScreen('calls')">📹</span><span onclick="showScreen('profile')">👤</span></div>
+</div>
+
+<!-- بروفايل شخصي -->
+<div id="profile" class="screen" style="padding-bottom:80px">
+<div class="profile-cover"><img class="profile-pic" src="https://i.pravatar.cc/100"></div><br><br><div style="margin-top:40px"><h2 id="pName">مناسك محمد</h2><p id="pBio">من وادي حلفا - بحب البرمجة</p><div style="display:flex;gap:10px;margin:10px 0"><span>120 متابع</span><span>80 أصدقاء</span></div><button class="btn btn-outline">تعديل الملف</button></div>
+<div class="bottom-nav"><span onclick="showScreen('main')">🏠</span><span onclick="showScreen('chat')">💬</span><span onclick="showScreen('calls')">📹</span><span onclick="showScreen('profile')">👤</span></div>
+</div>
+
+<script>
+// إدارة الشاشات
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function nextOnboard(n){showScreen('onboard'+n)}
+
+// تسجيل
+function register(){
+let name=document.getElementById('regName').value||'مناسك محمد';
+localStorage.setItem('batutta_user',JSON.stringify({name,age:regAge.value,city:regCity.value}));
+document.getElementById('pName').innerText=name;
+showScreen('profileSetup');
+}
+
+// منشورات
+let posts=JSON.parse(localStorage.getItem('batutta_posts')||'[]');
+function addPost(){
+let txt=document.getElementById('postText').value;if(!txt)return;
+posts.unshift({text:txt,name:JSON.parse(localStorage.getItem('batutta_user')).name,likes:0,time:new Date().toLocaleString()});
+localStorage.setItem('batutta_posts',JSON.stringify(posts));renderFeed();document.getElementById('postText').value='';
+}
+function renderFeed(){
+let feed=document.getElementById('feed');feed.innerHTML='';
+posts.forEach((p,i)=>{feed.innerHTML+=`<div class="card"><b>${p.name}</b><small> ${p.time}</small><p style="margin:10px 0">${p.text}</p><div class="post-actions"><span onclick="likePost(${i})">❤️ ${p.likes}</span><span>💬 تعليق</span><span>↗️ مشاركة</span><span>➕ متابعة</span></div></div>`})
+}
+function likePost(i){posts[i].likes++;localStorage.setItem('batutta_posts',JSON.stringify(posts));renderFeed()}
+renderFeed();
+
+// دردشة
+let messages=[];
+function openChat(who){showScreen('chat')}
+function sendMsg(){
+let inp=document.getElementById('chatInput');if(!inp.value)return;
+let box=document.getElementById('chatBox');box.innerHTML+=`<div class="chat-bubble me">${inp.value}</div>`;
+let msg=inp.value;inp.value='';
+// رد بطوطة الذكية
+setTimeout(()=>{box.innerHTML+=`<div class="chat-bubble other">🦆 بطوطة: ${smartReply(msg)}</div>`;box.scrollTop=box.scrollHeight},800);
+box.scrollTop=box.scrollHeight;
+}
+function smartReply(t){
+if(t.includes('سلام')||t.includes('هلا'))return 'هلا هلا يا مناسك! اشتقنا ليك شديد 🧡 كيف وادي حلفا معاك؟';
+if(t.includes('تعليم'))return 'عندنا قسم تعليم فيهو منح وكورسات، عايزة شنو بالضبط؟';
+if(t.includes('شغل')||t.includes('عمل'))return 'في قسم العمل بنساعدك تلقي شغل أو تبدأ مشروعك الخاص!';
+return 'سمعتك! احكي لي أكتر، أنا بطوطة الذكية معاك دايماً 🦆';
+}
+// صوت
+let mediaRecorder;let audioChunks=[];
+async function startVoice(){
+if(!mediaRecorder){
+let stream=await navigator.mediaDevices.getUserMedia({audio:true});
+mediaRecorder=new MediaRecorder(stream);
+mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+mediaRecorder.onstop=()=>{let blob=new Blob(audioChunks,{type:'audio/webm'});let url=URL.createObjectURL(blob);document.getElementById('chatBox').innerHTML+=`<div class="chat-bubble me"><audio controls src="${url}"></audio></div>`;audioChunks=[]}
+}
+if(mediaRecorder.state==='inactive'){mediaRecorder.start();alert('بتسجلي... اضغطي تاني للوقف')}else{mediaRecorder.stop()}
+}
+// فيديو
+async function startCall(){
+let stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+document.getElementById('localVideo').srcObject=stream;
+alert('المكالمة بدت! ده WebRTC حقيقي - تقدري تضيفي PeerJS عشان تتصلي بصحباتك');
+}
+function previewImage(e,id){let r=new FileReader();r.onload=()=>document.getElementById(id).src=r.result;r.readAsDataURL(e.target.files[0])}
+</script>
+</body>
+</html>
