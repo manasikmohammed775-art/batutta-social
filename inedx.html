@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>batutta 🦆</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system}
+body{margin:0;background:#fff}
+:root{--orange:#FF6B00}
+.center{min-height:100vh;background:var(--orange);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.logo{font-size:42px;font-weight:900;color:#fff;margin-bottom:20px}
+.card{background:#fff;border-radius:16px;padding:15px;margin:10px;width:95%;max-width:480px;box-shadow:0 4px 12px #0001}
+.title{font-size:20px;font-weight:bold;text-align:center;margin-bottom:10px}
+.desc{text-align:center;color:#555;margin-bottom:10px}
+.input{background:#f2f2f2;border:none;border-radius:10px;padding:12px;margin-top:8px;width:100%;outline:none}
+.btn{background:var(--orange);padding:14px;border-radius:12px;margin-top:10px;border:none;width:100%;color:#fff;font-weight:bold;cursor:pointer}
+.header{padding:15px;display:flex;justify-content:space-between;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;z-index:10}
+.tab{display:flex;justify-content:space-around;padding:12px;border-top:1px solid #eee;position:sticky;bottom:0;background:#fff}
+.chat-msg{padding:8px 12px;border-radius:10px;margin-top:6px;max-width:80%}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const supabaseClient = supabase.createClient('https://itoareabdaofdfyvjdvd.supabase.co','sb_publishable_OlTsulPNb1L4P_Oka1wtkQ_6dJVqEPi');
+let screen='onboarding',step=0,user=null,posts=[],chats=[{from:'batutta',text:'أهلا أنا بطوطة الذكية 🦆 بتكلم عربي وانجليزي'}];
+const onboard=[{t:'سياحة 🌍',d:'شارك أماكن السودان الجميلة'},{t:'تعليم 🎓',d:'كورسات ونصائح'},{t:'عمل 💼',d:'فرص عمل ومشاريع'},{t:'علاج 🏥',d:'تجارب واستشارات'},{t:'تجارب ودردشات 💬',d:'احكي قصتك واتونس'}];
+function render(){
+ const app=document.getElementById('app');
+ if(screen==='onboarding'){
+  app.innerHTML=`<div class="center"><div class="logo">🦆 batutta</div><div class="card"><div class="title">${onboard[step].t}</div><div class="desc">${onboard[step].d}</div><button class="btn" onclick="nextOnboard()">${step<4?'التالي':'ابدأ'}</button></div><div style="color:#fff;margin-top:10px">${step+1}/5</div></div>`;
+ }else if(screen==='register'||screen==='login'){
+  const isReg=screen==='register';
+  app.innerHTML=`<div class="center"><div class="logo">batutta</div><div class="card"><div class="title">${isReg?'ملف شخصي كامل':'دخول'}</div>${isReg?`<input class="input" placeholder="الاسم الكامل *" id="name"><input class="input" placeholder="العمر *" id="age" type="number"><input class="input" placeholder="النوع ذكر/أنثى *" id="gender"><input class="input" placeholder="الحالة الاجتماعية" id="statusUser"><input class="input" placeholder="الدراسة / العمل" id="study"><input class="input" placeholder="تاريخ الميلاد" id="birth"><input class="input" placeholder="المدينة" id="city"><input class="input" placeholder="رقم الهاتف / واتساب" id="phone"><input class="input" placeholder="نبذة عنك" id="bio">`:''}<input class="input" placeholder="الايميل *" id="email"><input class="input" placeholder="كلمة السر *" id="pass" type="password"><button class="btn" onclick="${isReg?'registerFull()':'login()'}">${isReg?'انشاء حسابي الكامل':'دخول'}</button><div style="text-align:center;color:#FF6B00;margin-top:10px;cursor:pointer" onclick="toggleScreen()">${isReg?'عندك حساب؟ دخول':'ما عندك حساب؟ تسجيل'}</div></div></div>`;
+ }else{
+  app.innerHTML=`<div style="min-height:100vh;display:flex;flex-direction:column"><div class="header"><span style="color:#FF6B00;font-weight:900;font-size:20px">batutta 🦆</span><span style="font-size:11px">${user?.email||''}</span></div><div style="flex:1;padding-bottom:70px;max-width:600px;margin:0 auto;width:100%"><div class="card"><input class="input" placeholder="شنو في بالك؟" id="postText"><button class="btn" onclick="createPost()">نشر</button></div><div class="card" style="background:#FFF3E8;border:1px solid #FF6B00"><div style="color:#FF6B00;font-weight:bold">بطوطة الذكية - عربي وانجليزي + ذكاء اصطناعي</div><div style="display:flex;flex-direction:column;margin-top:8px">${chats.map(m=>`<div class="chat-msg" style="background:${m.from==='you'?'#FF6B00':'#fff'};color:${m.from==='you'?'#fff':'#000'};align-self:${m.from==='you'?'flex-end':'flex-start'};padding:8px;border-radius:10px;margin-top:6px">${m.text}</div>`).join('')}</div><div style="display:flex;gap:8px;margin-top:10px"><input class="input" style="flex:1" placeholder="احكي مع بطوطة..." id="chatText"><button class="btn" style="width:auto" onclick="sendChat()">ارسال</button></div></div><div>${posts.map(p=>`<div class="card"><div style="font-weight:bold">${p.author_name||'مستخدم'}</div><div style="margin-top:5px">${p.content}</div><div style="display:flex;gap:10px;margin-top:10px;font-size:13px"><span>❤️ لايك</span><span>💬 تعليق</span><span>👥 متابعة</span><span>📞 مكالمة</span><span>📹 فيديو</span></div></div>`).join('')}</div></div><div class="tab"><span style="color:#FF6B00">🏠</span><span>🔍</span><span>🎬</span><span>💬</span><span>👤</span></div></div>`;
+ }
+}
+function nextOnboard(){ if(step<4) step++; else screen='register'; render(); }
+function toggleScreen(){ screen=screen==='register'?'login':'register'; render(); }
+async function loadPosts(){ const {data}=await supabaseClient.from('posts').select('*').order('created_at',{ascending:false}); if(data){posts=data; if(screen==='main') render();} }
+async function registerFull(){
+ const vals={name:document.getElementById('name')?.value,email:document.getElementById('email')?.value,pass:document.getElementById('pass')?.value,age:document.getElementById('age')?.value,gender:document.getElementById('gender')?.value,statusUser:document.getElementById('statusUser')?.value,study:document.getElementById('study')?.value,birth:document.getElementById('birth')?.value,city:document.getElementById('city')?.value,phone:document.getElementById('phone')?.value,bio:document.getElementById('bio')?.value};
+ if(!vals.name||!vals.email||!vals.pass||!vals.age||!vals.gender){alert('املا الحقول المهمة *');return;}
+ const {data,error}=await supabaseClient.auth.signUp({email:vals.email,password:vals.pass,options:{data:{full_name:vals.name}}});
+ if(error){alert(error.message);return;}
+ if(data.user){await supabaseClient.from('profiles').insert({id:data.user.id,full_name:vals.name,phone:vals.phone,age:parseInt(vals.age),gender:vals.gender,status:vals.statusUser,study:vals.study,birth_date:vals.birth,city:vals.city,bio:vals.bio});alert('تم! افتح ايميلك للتأكيد');screen='login';render();}
+}
+async function login(){
+ const e=document.getElementById('email')?.value, p=document.getElementById('pass')?.value;
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});
+ if(error) alert(error.message); else {user=data.user; screen='main'; render(); loadPosts();}
+}
+async function createPost(){
+ const txt=document.getElementById('postText')?.value; if(!txt) return;
+ const author=document.getElementById('name')?.value||user?.email||'مستخدم';
+ await supabaseClient.from('posts').insert({user_id:user?.id,content:txt,author_name:author}); loadPosts();
+}
+function sendChat(){
+ const txt=document.getElementById('chatText')?.value; if(!txt) return;
+ chats.push({from:'you',text:txt}); chats.push({from:'batutta',text:`فهمتك: "${txt}" - رد ذكي من بطوطة 🦆`}); render();
+}
+render(); loadPosts();
+</script>
+</body>
+</html>
