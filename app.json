@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "batutta",
+    "slug": "batutta-social",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icon.png",
+    "splash": {
+      "image": "./icon.png",
+      "backgroundColor": "#FF6B00",
+      "resizeMode": "contain"
+    },
+    "primaryColor": "#FF6B00",
+    "platforms": ["ios", "android", "web"]
+  }
+}
